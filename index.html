@@ -1,169 +1,1053 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simple 3D FPS</title>
-<style>
-  * { box-sizing: border-box; }
-  body { margin:0; overflow:hidden; background:#000; font-family:Arial,sans-serif; }
-  #ui { position:fixed; inset:0; pointer-events:none; color:white; }
-  #crosshair { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-size:34px; }
-  #hud { position:absolute; left:20px; top:18px; font-size:20px; text-shadow:0 2px 3px #000; }
-  #message {
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    background:rgba(0,0,0,.55); pointer-events:auto; text-align:center;
-  }
-  #panel { background:rgba(20,20,20,.9); padding:32px 45px; border:1px solid #777; border-radius:12px; }
-  button { font-size:20px; padding:12px 28px; cursor:pointer; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Kim | Creative Developer</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #08090d;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* 배경 */
+        .background {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background:
+                radial-gradient(
+                    circle at var(--x, 50%) var(--y, 50%),
+                    rgba(120, 100, 255, 0.18),
+                    transparent 25%
+                ),
+                #08090d;
+        }
+
+        .grid {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.15;
+
+            background-image:
+                linear-gradient(#fff 1px, transparent 1px),
+                linear-gradient(90deg, #fff 1px, transparent 1px);
+
+            background-size: 60px 60px;
+
+            mask-image: linear-gradient(
+                to bottom,
+                black,
+                transparent
+            );
+        }
+
+        /* 상단 진행바 */
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            background: #8b7cff;
+            z-index: 9999;
+        }
+
+        /* 네비게이션 */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 0 7%;
+
+            background: rgba(8, 9, 13, 0.65);
+            backdrop-filter: blur(15px);
+
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: #8b7cff;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 35px;
+            list-style: none;
+        }
+
+        nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: white;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+
+            padding: 120px 8%;
+
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+        }
+
+        .eyebrow {
+            color: #8b7cff;
+            font-size: 13px;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+        }
+
+        .hero h1 {
+            font-size: clamp(65px, 11vw, 150px);
+            line-height: 0.85;
+            letter-spacing: -8px;
+        }
+
+        .outline {
+            color: transparent;
+            -webkit-text-stroke: 1px white;
+        }
+
+        .hero-description {
+            max-width: 600px;
+            color: #888;
+            font-size: 18px;
+            line-height: 1.8;
+            margin-top: 40px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 25px;
+
+            border-radius: 50px;
+
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+
+            transition: 0.3s;
+        }
+
+        .primary {
+            background: white;
+            color: black;
+        }
+
+        .primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255,255,255,0.15);
+        }
+
+        .secondary {
+            border: 1px solid #333;
+            color: white;
+        }
+
+        .secondary:hover {
+            background: #171820;
+            transform: translateY(-5px);
+        }
+
+        /* 떠다니는 원 */
+        .orb {
+            position: absolute;
+
+            width: 400px;
+            height: 400px;
+
+            right: 8%;
+            top: 25%;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle at 30% 30%,
+                    #c4bcff,
+                    #6655ff 30%,
+                    #11121a 70%
+                );
+
+            filter: blur(2px);
+
+            opacity: 0.55;
+
+            animation: floating 7s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0%,100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-35px) rotate(10deg);
+            }
+        }
+
+        /* SECTION */
+        section {
+            padding: 140px 8%;
+        }
+
+        .section-title {
+            font-size: clamp(45px, 7vw, 90px);
+            letter-spacing: -5px;
+            margin-bottom: 70px;
+        }
+
+        .section-title span {
+            color: #555;
+        }
+
+        /* ABOUT */
+        .about {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+        }
+
+        .about-text {
+            color: #888;
+            font-size: 17px;
+            line-height: 2;
+        }
+
+        .about-text strong {
+            color: white;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat {
+            padding: 35px;
+            border: 1px solid #24252c;
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.02);
+
+            transition: 0.3s;
+        }
+
+        .stat:hover {
+            transform: translateY(-8px);
+            border-color: #6655ff;
+        }
+
+        .stat h3 {
+            font-size: 45px;
+        }
+
+        .stat p {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* SKILLS */
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .skill {
+            padding: 17px 25px;
+
+            border: 1px solid #292a32;
+            border-radius: 50px;
+
+            color: #999;
+
+            transition: 0.3s;
+        }
+
+        .skill:hover {
+            color: white;
+            background: #161720;
+            border-color: #6655ff;
+            transform: translateY(-6px) rotate(-2deg);
+        }
+
+        /* PROJECTS */
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .project {
+            height: 430px;
+
+            padding: 35px;
+
+            position: relative;
+            overflow: hidden;
+
+            border-radius: 25px;
+            border: 1px solid #22232b;
+
+            background: #101117;
+
+            transform-style: preserve-3d;
+
+            transition: transform 0.15s ease;
+        }
+
+        .project::before {
+            content: "";
+
+            position: absolute;
+
+            width: 250px;
+            height: 250px;
+
+            right: -100px;
+            top: -100px;
+
+            border-radius: 50%;
+
+            background: #6655ff;
+
+            filter: blur(100px);
+
+            opacity: 0.15;
+        }
+
+        .project-number {
+            color: #555;
+            font-size: 13px;
+        }
+
+        .project h3 {
+            font-size: 42px;
+            line-height: 1;
+            margin-top: 70px;
+        }
+
+        .project p {
+            color: #777;
+            line-height: 1.8;
+            max-width: 450px;
+            margin-top: 25px;
+        }
+
+        .tags {
+            position: absolute;
+            bottom: 30px;
+
+            display: flex;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #1b1c24;
+            color: #888;
+
+            padding: 7px 12px;
+            border-radius: 20px;
+
+            font-size: 11px;
+        }
+
+        /* EXPERIENCE */
+        .timeline {
+            max-width: 850px;
+            border-left: 1px solid #292a30;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 0 0 70px 45px;
+        }
+
+        .timeline-item::before {
+            content: "";
+
+            position: absolute;
+
+            left: -5px;
+            top: 4px;
+
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+
+            background: #8b7cff;
+
+            box-shadow: 0 0 20px #8b7cff;
+        }
+
+        .year {
+            color: #8b7cff;
+            font-size: 13px;
+        }
+
+        .timeline h3 {
+            font-size: 28px;
+            margin: 10px 0;
+        }
+
+        .timeline p {
+            color: #666;
+        }
+
+        /* CONTACT */
+        .contact {
+            min-height: 80vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+        }
+
+        .contact h2 {
+            font-size: clamp(60px, 10vw, 140px);
+            line-height: .85;
+            letter-spacing: -7px;
+        }
+
+        .contact h2 span {
+            color: #8b7cff;
+        }
+
+        .contact p {
+            color: #666;
+            margin: 35px 0;
+        }
+
+        /* 등장 애니메이션 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(70px);
+
+            transition:
+                opacity 1s ease,
+                transform 1s cubic-bezier(.16,1,.3,1);
+        }
+
+        .reveal.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 모바일 */
+        @media (max-width: 800px) {
+
+            nav {
+                padding: 0 5%;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .orb {
+                width: 250px;
+                height: 250px;
+                right: -100px;
+                opacity: 0.3;
+            }
+
+            .hero {
+                padding: 120px 6%;
+            }
+
+            .hero h1 {
+                letter-spacing: -5px;
+            }
+
+            section {
+                padding: 100px 6%;
+            }
+
+            .about {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .projects {
+                grid-template-columns: 1fr;
+            }
+
+            .project {
+                height: 380px;
+            }
+
+            .stats {
+                gap: 10px;
+            }
+
+            .stat {
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
+
+
 <body>
-<div id="ui">
-  <div id="hud">점수: <span id="score">0</span> &nbsp; 체력: <span id="health">100</span></div>
-  <div id="crosshair">+</div>
-  <div id="message"><div id="panel"><h1>Simple 3D FPS</h1><p>WASD: 이동<br>마우스: 시점<br>클릭: 발사</p><button id="start">게임 시작</button></div></div>
-</div>
 
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+    <div class="background"></div>
+    <div class="grid"></div>
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87b7df);
-scene.fog = new THREE.Fog(0x87b7df, 25, 100);
+    <div class="progress"></div>
 
-const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 300);
-camera.position.set(0, 1.7, 8);
 
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(devicePixelRatio);
-document.body.appendChild(renderer.domElement);
+    <!-- NAVIGATION -->
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0x445566, 2));
-const sun = new THREE.DirectionalLight(0xffffff, 1.5);
-sun.position.set(10,20,10);
-scene.add(sun);
+    <nav>
 
-const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(200,200),
-  new THREE.MeshStandardMaterial({color:0x4d7d42})
-);
-floor.rotation.x = -Math.PI/2;
-scene.add(floor);
+        <div class="logo">
+            ALEX<span>.</span>
+        </div>
 
-const walls = [];
-function wall(x,z,w,d) {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w,5,d),
-    new THREE.MeshStandardMaterial({color:0x888888}));
-  m.position.set(x,2.5,z); scene.add(m); walls.push(m);
-}
-wall(0,-30,60,1); wall(0,30,60,1); wall(-30,0,1,60); wall(30,0,1,60);
-for(let i=0;i<12;i++) wall((Math.random()-.5)*45,(Math.random()-.5)*45,3+Math.random()*5,3+Math.random()*5);
+        <ul>
+            <li><a href="#about">ABOUT</a></li>
+            <li><a href="#skills">SKILLS</a></li>
+            <li><a href="#projects">PROJECTS</a></li>
+            <li><a href="#experience">EXPERIENCE</a></li>
+            <li><a href="#contact">CONTACT</a></li>
+        </ul>
 
-const enemies = [];
-function spawnEnemy() {
-  const e = new THREE.Mesh(
-    new THREE.BoxGeometry(1.4,2.4,1.4),
-    new THREE.MeshStandardMaterial({color:0xc62828})
-  );
-  let x,z;
-  do { x=(Math.random()-.5)*48; z=(Math.random()-.5)*48; }
-  while(Math.hypot(x-camera.position.x,z-camera.position.z)<10);
-  e.position.set(x,1.2,z);
-  e.userData.hp=2;
-  scene.add(e); enemies.push(e);
-}
-for(let i=0;i<12;i++) spawnEnemy();
+    </nav>
 
-const keys = {};
-let yaw=0, pitch=0, locked=false, score=0, health=100, lastShot=0;
-const scoreEl=document.getElementById('score'), healthEl=document.getElementById('health');
-const message=document.getElementById('message');
-document.getElementById('start').onclick=()=>renderer.domElement.requestPointerLock();
 
-renderer.domElement.addEventListener('click',()=>{
-  if(!locked) return;
-  const now=performance.now();
-  if(now-lastShot<180) return;
-  lastShot=now;
-  const ray=new THREE.Raycaster();
-  ray.setFromCamera(new THREE.Vector2(0,0),camera);
-  const hit=ray.intersectObjects(enemies,false)[0];
-  if(hit) {
-    const e=hit.object; e.userData.hp--;
-    e.material.emissive.setHex(0x550000);
-    setTimeout(()=>e.material.emissive.setHex(0x000000),70);
-    if(e.userData.hp<=0) {
-      scene.remove(e); enemies.splice(enemies.indexOf(e),1);
-      score+=100; scoreEl.textContent=score;
-      spawnEnemy();
-    }
-  }
-});
+    <!-- HERO -->
 
-document.addEventListener('pointerlockchange',()=>{
-  locked=document.pointerLockElement===renderer.domElement;
-  message.style.display=locked?'none':'flex';
-});
-document.addEventListener('mousemove',e=>{
-  if(!locked) return;
-  yaw-=e.movementX*0.0025;
-  pitch-=e.movementY*0.0025;
-  pitch=Math.max(-1.5,Math.min(1.5,pitch));
-  camera.rotation.set(pitch,yaw,0,'YXZ');
-});
-document.addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);
-document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+    <header class="hero">
 
-const clock=new THREE.Clock();
-function update(dt) {
-  if(!locked || health<=0) return;
-  const speed=9;
-  const forward=new THREE.Vector3(Math.sin(yaw),0,-Math.cos(yaw));
-  const right=new THREE.Vector3(Math.cos(yaw),0,Math.sin(yaw));
-  const move=new THREE.Vector3();
-  if(keys.w) move.add(forward);
-  if(keys.s) move.sub(forward);
-  if(keys.d) move.add(right);
-  if(keys.a) move.sub(right);
-  if(move.lengthSq()) {
-    move.normalize().multiplyScalar(speed*dt);
-    const next=camera.position.clone().add(move);
-    next.x=Math.max(-28,Math.min(28,next.x));
-    next.z=Math.max(-28,Math.min(28,next.z));
-    camera.position.copy(next);
-  }
-  for(const e of enemies) {
-    const dir=new THREE.Vector3().subVectors(camera.position,e.position);
-    dir.y=0;
-    const dist=dir.length();
-    if(dist>1.8) {
-      dir.normalize();
-      e.position.addScaledVector(dir,2.2*dt);
-      e.lookAt(camera.position.x,e.position.y,camera.position.z);
-    } else {
-      health-=18*dt; health=Math.max(0,health);
-      healthEl.textContent=Math.ceil(health);
-      if(health<=0) {
-        document.getElementById('panel').innerHTML='<h1>GAME OVER</h1><p>점수: '+score+'</p><button id="restart">다시 시작</button>';
-        message.style.display='flex';
-        if(document.pointerLockElement) document.exitPointerLock();
-        document.getElementById('restart').onclick=()=>location.reload();
-      }
-    }
-  }
-}
-function loop() {
-  requestAnimationFrame(loop);
-  update(Math.min(clock.getDelta(),0.05));
-  renderer.render(scene,camera);
-}
-loop();
-addEventListener('resize',()=>{
-  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);
-});
-</script>
+        <div class="hero-content">
+
+            <div class="eyebrow">
+                CREATIVE DEVELOPER / AI ENGINEER
+            </div>
+
+            <h1>
+                BUILD<br>
+                <span class="outline">WHAT'S</span><br>
+                NEXT.
+            </h1>
+
+            <p class="hero-description">
+                기술과 아이디어를 연결하여
+                새로운 디지털 경험을 만드는 개발자입니다.
+                AI, Web, Data를 중심으로 다양한 프로젝트를 진행합니다.
+            </p>
+
+            <div class="buttons">
+
+                <a href="#projects" class="btn primary">
+                    PROJECTS →
+                </a>
+
+                <a href="#contact" class="btn secondary">
+                    CONTACT
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="orb"></div>
+
+    </header>
+
+
+    <!-- ABOUT -->
+
+    <section id="about">
+
+        <h2 class="section-title reveal">
+            ABOUT <span>ME</span>
+        </h2>
+
+        <div class="about reveal">
+
+            <div class="about-text">
+
+                <p>
+                    안녕하세요.
+                    저는 새로운 기술을 실험하고
+                    그것을 실제 서비스와 경험으로 연결하는
+                    <strong>Creative Developer</strong>입니다.
+                </p>
+
+                <br>
+
+                <p>
+                    AI와 데이터 분석부터
+                    인터랙티브 웹, IoT까지
+                    서로 다른 기술을 결합하여
+                    새로운 가능성을 탐색합니다.
+                </p>
+
+                <br>
+
+                <p>
+                    복잡한 기술을 쉽고 재미있는 경험으로
+                    만드는 것을 가장 중요하게 생각합니다.
+                </p>
+
+            </div>
+
+
+            <div class="stats">
+
+                <div class="stat">
+                    <h3>42+</h3>
+                    <p>Projects</p>
+                </div>
+
+                <div class="stat">
+                    <h3>08</h3>
+                    <p>Years</p>
+                </div>
+
+                <div class="stat">
+                    <h3>18</h3>
+                    <p>Technologies</p>
+                </div>
+
+                <div class="stat">
+                    <h3>12K</h3>
+                    <p>Lines of Code</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SKILLS -->
+
+    <section id="skills">
+
+        <h2 class="section-title reveal">
+            MY <span>TOOLBOX</span>
+        </h2>
+
+        <div class="skills reveal">
+
+            <div class="skill">Python</div>
+            <div class="skill">JavaScript</div>
+            <div class="skill">React</div>
+            <div class="skill">Node.js</div>
+            <div class="skill">TensorFlow</div>
+            <div class="skill">PyTorch</div>
+            <div class="skill">OpenCV</div>
+            <div class="skill">Generative AI</div>
+            <div class="skill">Data Analysis</div>
+            <div class="skill">Arduino</div>
+            <div class="skill">ESP32</div>
+            <div class="skill">IoT</div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PROJECTS -->
+
+    <section id="projects">
+
+        <h2 class="section-title reveal">
+            SELECTED <span>WORK</span>
+        </h2>
+
+
+        <div class="projects">
+
+            <article class="project reveal">
+
+                <div class="project-number">
+                    01 / AI
+                </div>
+
+                <h3>
+                    Vision<br>
+                    Assistant
+                </h3>
+
+                <p>
+                    카메라 영상을 실시간 분석하여
+                    주변 사물을 인식하고 사용자에게
+                    정보를 제공하는 AI 시스템.
+                </p>
+
+                <div class="tags">
+                    <span class="tag">Python</span>
+                    <span class="tag">YOLO</span>
+                    <span class="tag">AI</span>
+                </div>
+
+            </article>
+
+
+            <article class="project reveal">
+
+                <div class="project-number">
+                    02 / WEB
+                </div>
+
+                <h3>
+                    Urban<br>
+                    Flow
+                </h3>
+
+                <p>
+                    도시 데이터를 인터랙티브하게
+                    시각화하여 복잡한 정보를
+                    직관적으로 탐색할 수 있는 웹.
+                </p>
+
+                <div class="tags">
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">WebGL</span>
+                    <span class="tag">Data</span>
+                </div>
+
+            </article>
+
+
+            <article class="project reveal">
+
+                <div class="project-number">
+                    03 / IoT
+                </div>
+
+                <h3>
+                    Smart<br>
+                    Garden
+                </h3>
+
+                <p>
+                    토양 습도와 온도를 측정하고
+                    조건에 따라 자동으로 물을 공급하는
+                    스마트 IoT 시스템.
+                </p>
+
+                <div class="tags">
+                    <span class="tag">ESP32</span>
+                    <span class="tag">IoT</span>
+                    <span class="tag">Sensor</span>
+                </div>
+
+            </article>
+
+
+            <article class="project reveal">
+
+                <div class="project-number">
+                    04 / QUANTUM
+                </div>
+
+                <h3>
+                    Quantum<br>
+                    Game
+                </h3>
+
+                <p>
+                    게임 이론과 양자 컴퓨팅을 결합하여
+                    전략에 따른 결과를 시각적으로
+                    실험할 수 있는 프로젝트.
+                </p>
+
+                <div class="tags">
+                    <span class="tag">Qiskit</span>
+                    <span class="tag">Quantum</span>
+                    <span class="tag">Game</span>
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!-- EXPERIENCE -->
+
+    <section id="experience">
+
+        <h2 class="section-title reveal">
+            EXPERIENCE <span>LOG</span>
+        </h2>
+
+
+        <div class="timeline">
+
+            <div class="timeline-item reveal">
+
+                <div class="year">
+                    2026
+                </div>
+
+                <h3>
+                    Independent AI Developer
+                </h3>
+
+                <p>
+                    생성형 AI와 인터랙티브 웹을 활용한
+                    다양한 실험 프로젝트 진행
+                </p>
+
+            </div>
+
+
+            <div class="timeline-item reveal">
+
+                <div class="year">
+                    2024 — 2025
+                </div>
+
+                <h3>
+                    Creative Technology Lab
+                </h3>
+
+                <p>
+                    AI, IoT, 데이터 시각화 프로젝트 개발
+                </p>
+
+            </div>
+
+
+            <div class="timeline-item reveal">
+
+                <div class="year">
+                    2021 — 2024
+                </div>
+
+                <h3>
+                    Web Developer
+                </h3>
+
+                <p>
+                    사용자 경험을 중심으로 한
+                    웹 서비스 및 인터랙티브 콘텐츠 개발
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CONTACT -->
+
+    <section id="contact" class="contact">
+
+        <div class="reveal">
+
+            <div class="eyebrow">
+                HAVE AN IDEA?
+            </div>
+
+            <h2>
+                LET'S<br>
+                <span>CREATE.</span>
+            </h2>
+
+            <p>
+                새로운 프로젝트를 함께 만들어보세요.
+            </p>
+
+            <a
+                href="mailto:hello@example.com"
+                class="btn primary"
+            >
+                hello@example.com
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <script>
+
+        /* 마우스 위치 */
+
+        document.addEventListener("mousemove", function(e) {
+
+            document.documentElement.style.setProperty(
+                "--x",
+                e.clientX + "px"
+            );
+
+            document.documentElement.style.setProperty(
+                "--y",
+                e.clientY + "px"
+            );
+
+        });
+
+
+        /* 스크롤 진행률 */
+
+        window.addEventListener("scroll", function() {
+
+            const scrollTop = window.scrollY;
+
+            const documentHeight =
+                document.documentElement.scrollHeight -
+                window.innerHeight;
+
+            const progress =
+                (scrollTop / documentHeight) * 100;
+
+            document.querySelector(".progress")
+                .style.width = progress + "%";
+
+        });
+
+
+        /* 등장 애니메이션 */
+
+        const observer =
+            new IntersectionObserver(
+                function(entries) {
+
+                    entries.forEach(function(entry) {
+
+                        if (entry.isIntersecting) {
+
+                            entry.target.classList.add("show");
+
+                        }
+
+                    });
+
+                },
+                {
+                    threshold: 0.15
+                }
+            );
+
+
+        document
+            .querySelectorAll(".reveal")
+            .forEach(function(element) {
+
+                observer.observe(element);
+
+            });
+
+
+        /* 프로젝트 3D Tilt */
+
+        document
+            .querySelectorAll(".project")
+            .forEach(function(card) {
+
+                card.addEventListener(
+                    "mousemove",
+                    function(e) {
+
+                        const rect =
+                            card.getBoundingClientRect();
+
+                        const x =
+                            e.clientX - rect.left;
+
+                        const y =
+                            e.clientY - rect.top;
+
+                        const centerX =
+                            rect.width / 2;
+
+                        const centerY =
+                            rect.height / 2;
+
+                        const rotateX =
+                            (y - centerY) / 20;
+
+                        const rotateY =
+                            (centerX - x) / 20;
+
+                        card.style.transform =
+                            `
+                            perspective(800px)
+                            rotateX(${rotateX}deg)
+                            rotateY(${rotateY}deg)
+                            translateY(-8px)
+                            `;
+
+                    }
+                );
+
+
+                card.addEventListener(
+                    "mouseleave",
+                    function() {
+
+                        card.style.transform =
+                            "perspective(800px) rotateX(0deg) rotateY(0deg)";
+
+                    }
+                );
+
+            });
+
+    </script>
+
 </body>
 </html>
