@@ -1,1053 +1,1003 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alex Kim | Creative Developer</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #08090d;
-            color: white;
-            overflow-x: hidden;
-        }
-
-        /* 배경 */
-        .background {
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            background:
-                radial-gradient(
-                    circle at var(--x, 50%) var(--y, 50%),
-                    rgba(120, 100, 255, 0.18),
-                    transparent 25%
-                ),
-                #08090d;
-        }
-
-        .grid {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            opacity: 0.15;
-
-            background-image:
-                linear-gradient(#fff 1px, transparent 1px),
-                linear-gradient(90deg, #fff 1px, transparent 1px);
-
-            background-size: 60px 60px;
-
-            mask-image: linear-gradient(
-                to bottom,
-                black,
-                transparent
-            );
-        }
-
-        /* 상단 진행바 */
-        .progress {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 3px;
-            width: 0%;
-            background: #8b7cff;
-            z-index: 9999;
-        }
-
-        /* 네비게이션 */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            padding: 0 7%;
-
-            background: rgba(8, 9, 13, 0.65);
-            backdrop-filter: blur(15px);
-
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            letter-spacing: -1px;
-        }
-
-        .logo span {
-            color: #8b7cff;
-        }
-
-        nav ul {
-            display: flex;
-            gap: 35px;
-            list-style: none;
-        }
-
-        nav a {
-            color: #888;
-            text-decoration: none;
-            font-size: 13px;
-            transition: 0.3s;
-        }
-
-        nav a:hover {
-            color: white;
-        }
-
-        /* HERO */
-        .hero {
-            min-height: 100vh;
-
-            display: flex;
-            align-items: center;
-
-            padding: 120px 8%;
-
-            position: relative;
-        }
-
-        .hero-content {
-            max-width: 1000px;
-        }
-
-        .eyebrow {
-            color: #8b7cff;
-            font-size: 13px;
-            letter-spacing: 4px;
-            margin-bottom: 25px;
-        }
-
-        .hero h1 {
-            font-size: clamp(65px, 11vw, 150px);
-            line-height: 0.85;
-            letter-spacing: -8px;
-        }
-
-        .outline {
-            color: transparent;
-            -webkit-text-stroke: 1px white;
-        }
-
-        .hero-description {
-            max-width: 600px;
-            color: #888;
-            font-size: 18px;
-            line-height: 1.8;
-            margin-top: 40px;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 35px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 15px 25px;
-
-            border-radius: 50px;
-
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-
-            transition: 0.3s;
-        }
-
-        .primary {
-            background: white;
-            color: black;
-        }
-
-        .primary:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(255,255,255,0.15);
-        }
-
-        .secondary {
-            border: 1px solid #333;
-            color: white;
-        }
-
-        .secondary:hover {
-            background: #171820;
-            transform: translateY(-5px);
-        }
-
-        /* 떠다니는 원 */
-        .orb {
-            position: absolute;
-
-            width: 400px;
-            height: 400px;
-
-            right: 8%;
-            top: 25%;
-
-            border-radius: 50%;
-
-            background:
-                radial-gradient(
-                    circle at 30% 30%,
-                    #c4bcff,
-                    #6655ff 30%,
-                    #11121a 70%
-                );
-
-            filter: blur(2px);
-
-            opacity: 0.55;
-
-            animation: floating 7s ease-in-out infinite;
-        }
-
-        @keyframes floating {
-            0%,100% {
-                transform: translateY(0) rotate(0deg);
-            }
-
-            50% {
-                transform: translateY(-35px) rotate(10deg);
-            }
-        }
-
-        /* SECTION */
-        section {
-            padding: 140px 8%;
-        }
-
-        .section-title {
-            font-size: clamp(45px, 7vw, 90px);
-            letter-spacing: -5px;
-            margin-bottom: 70px;
-        }
-
-        .section-title span {
-            color: #555;
-        }
-
-        /* ABOUT */
-        .about {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-        }
-
-        .about-text {
-            color: #888;
-            font-size: 17px;
-            line-height: 2;
-        }
-
-        .about-text strong {
-            color: white;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .stat {
-            padding: 35px;
-            border: 1px solid #24252c;
-            border-radius: 20px;
-
-            background: rgba(255,255,255,0.02);
-
-            transition: 0.3s;
-        }
-
-        .stat:hover {
-            transform: translateY(-8px);
-            border-color: #6655ff;
-        }
-
-        .stat h3 {
-            font-size: 45px;
-        }
-
-        .stat p {
-            color: #666;
-            margin-top: 10px;
-        }
-
-        /* SKILLS */
-        .skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .skill {
-            padding: 17px 25px;
-
-            border: 1px solid #292a32;
-            border-radius: 50px;
-
-            color: #999;
-
-            transition: 0.3s;
-        }
-
-        .skill:hover {
-            color: white;
-            background: #161720;
-            border-color: #6655ff;
-            transform: translateY(-6px) rotate(-2deg);
-        }
-
-        /* PROJECTS */
-        .projects {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-
-        .project {
-            height: 430px;
-
-            padding: 35px;
 
-            position: relative;
-            overflow: hidden;
-
-            border-radius: 25px;
-            border: 1px solid #22232b;
-
-            background: #101117;
-
-            transform-style: preserve-3d;
-
-            transition: transform 0.15s ease;
-        }
+<meta charset="UTF-8">
 
-        .project::before {
-            content: "";
-
-            position: absolute;
-
-            width: 250px;
-            height: 250px;
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-            right: -100px;
-            top: -100px;
+<title>Portfolio Archive</title>
 
-            border-radius: 50%;
-
-            background: #6655ff;
-
-            filter: blur(100px);
-
-            opacity: 0.15;
-        }
-
-        .project-number {
-            color: #555;
-            font-size: 13px;
-        }
-
-        .project h3 {
-            font-size: 42px;
-            line-height: 1;
-            margin-top: 70px;
-        }
-
-        .project p {
-            color: #777;
-            line-height: 1.8;
-            max-width: 450px;
-            margin-top: 25px;
-        }
-
-        .tags {
-            position: absolute;
-            bottom: 30px;
-
-            display: flex;
-            gap: 8px;
-        }
-
-        .tag {
-            background: #1b1c24;
-            color: #888;
-
-            padding: 7px 12px;
-            border-radius: 20px;
-
-            font-size: 11px;
-        }
-
-        /* EXPERIENCE */
-        .timeline {
-            max-width: 850px;
-            border-left: 1px solid #292a30;
-        }
-
-        .timeline-item {
-            position: relative;
-            padding: 0 0 70px 45px;
-        }
-
-        .timeline-item::before {
-            content: "";
-
-            position: absolute;
-
-            left: -5px;
-            top: 4px;
-
-            width: 9px;
-            height: 9px;
-
-            border-radius: 50%;
-
-            background: #8b7cff;
-
-            box-shadow: 0 0 20px #8b7cff;
-        }
-
-        .year {
-            color: #8b7cff;
-            font-size: 13px;
-        }
-
-        .timeline h3 {
-            font-size: 28px;
-            margin: 10px 0;
-        }
-
-        .timeline p {
-            color: #666;
-        }
-
-        /* CONTACT */
-        .contact {
-            min-height: 80vh;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            text-align: center;
-        }
-
-        .contact h2 {
-            font-size: clamp(60px, 10vw, 140px);
-            line-height: .85;
-            letter-spacing: -7px;
-        }
-
-        .contact h2 span {
-            color: #8b7cff;
-        }
-
-        .contact p {
-            color: #666;
-            margin: 35px 0;
-        }
-
-        /* 등장 애니메이션 */
-        .reveal {
-            opacity: 0;
-            transform: translateY(70px);
-
-            transition:
-                opacity 1s ease,
-                transform 1s cubic-bezier(.16,1,.3,1);
-        }
-
-        .reveal.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* 모바일 */
-        @media (max-width: 800px) {
-
-            nav {
-                padding: 0 5%;
-            }
-
-            nav ul {
-                display: none;
-            }
-
-            .orb {
-                width: 250px;
-                height: 250px;
-                right: -100px;
-                opacity: 0.3;
-            }
-
-            .hero {
-                padding: 120px 6%;
-            }
-
-            .hero h1 {
-                letter-spacing: -5px;
-            }
-
-            section {
-                padding: 100px 6%;
-            }
-
-            .about {
-                grid-template-columns: 1fr;
-                gap: 50px;
-            }
-
-            .projects {
-                grid-template-columns: 1fr;
-            }
-
-            .project {
-                height: 380px;
-            }
-
-            .stats {
-                gap: 10px;
-            }
-
-            .stat {
-                padding: 25px;
-            }
-        }
-    </style>
+<style>
+
+/* =========================
+   RESET
+========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #0a0a0a;
+    color: #fff;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    overflow-x: hidden;
+}
+
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.background {
+    position: fixed;
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle at var(--mouse-x, 50%)
+            var(--mouse-y, 50%),
+            rgba(120, 100, 255, .15),
+            transparent 25%
+        );
+
+    pointer-events: none;
+    z-index: -2;
+}
+
+
+/* Grid */
+
+.grid {
+    position: fixed;
+    inset: 0;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,.035) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.035) 1px,
+            transparent 1px
+        );
+
+    background-size: 60px 60px;
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent
+        );
+
+    pointer-events: none;
+
+    z-index: -1;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+
+    height: 100px;
+
+    padding: 0 6%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.1);
+}
+
+.logo {
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+    letter-spacing: -1px;
+}
+
+.logo span {
+    color: #8b7cff;
+}
+
+
+.header-info {
+
+    color: #666;
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main {
+
+    width: 88%;
+
+    max-width: 1400px;
+
+    margin: auto;
+
+    padding: 100px 0 150px;
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+.title {
+
+    margin-bottom: 90px;
+}
+
+.title-small {
+
+    color: #8b7cff;
+
+    font-size: 12px;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 20px;
+}
+
+.title h1 {
+
+    font-size:
+        clamp(60px, 10vw, 150px);
+
+    line-height: .85;
+
+    letter-spacing: -8px;
+}
+
+.title h1 span {
+
+    color: transparent;
+
+    -webkit-text-stroke:
+        1px #fff;
+}
+
+
+/* =========================
+   LIST
+========================= */
+
+.list {
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.15);
+}
+
+
+/* =========================
+   ITEM
+========================= */
+
+.item {
+
+    position: relative;
+
+    min-height: 125px;
+
+    padding: 25px 20px;
+
+    display: grid;
+
+    grid-template-columns:
+        90px
+        1fr
+        250px
+        30px;
+
+    align-items: center;
+
+    gap: 30px;
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.12);
+
+    text-decoration: none;
+
+    color: white;
+
+    overflow: hidden;
+
+    transition:
+        background .4s ease;
+}
+
+
+/* hover background */
+
+.item::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 0;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(139,124,255,.16),
+            transparent
+        );
+
+    transition:
+        width .5s
+        cubic-bezier(.16,1,.3,1);
+}
+
+.item:hover::before {
+    width: 100%;
+}
+
+
+/* 번호 */
+
+.number {
+
+    color: #555;
+
+    font-size: 14px;
+
+    position: relative;
+
+    z-index: 1;
+
+    transition: .3s;
+}
+
+.item:hover .number {
+
+    color: #8b7cff;
+
+    transform:
+        translateX(10px);
+}
+
+
+/* 제목 */
+
+.name {
+
+    position: relative;
+
+    z-index: 1;
+
+    font-size:
+        clamp(28px, 4vw, 55px);
+
+    font-weight: 600;
+
+    letter-spacing: -3px;
+
+    transition:
+        transform .5s
+        cubic-bezier(.16,1,.3,1);
+}
+
+.item:hover .name {
+
+    transform:
+        translateX(20px);
+}
+
+
+/* 설명 */
+
+.description {
+
+    position: relative;
+
+    z-index: 1;
+
+    color: #666;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    transition: .3s;
+}
+
+.item:hover .description {
+    color: #aaa;
+}
+
+
+/* 화살표 */
+
+.arrow {
+
+    position: relative;
+
+    z-index: 1;
+
+    font-size: 22px;
+
+    color: #555;
+
+    transition:
+        .4s
+        cubic-bezier(.16,1,.3,1);
+}
+
+.item:hover .arrow {
+
+    color: white;
+
+    transform:
+        translateX(10px)
+        rotate(-45deg);
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+
+    margin-top: 100px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    color: #555;
+
+    font-size: 12px;
+}
+
+.footer-links {
+
+    display: flex;
+
+    gap: 25px;
+}
+
+.footer-links a {
+
+    color: #666;
+
+    text-decoration: none;
+
+    transition: .3s;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+
+/* =========================
+   HOVER PREVIEW
+========================= */
+
+.preview {
+
+    position: fixed;
+
+    width: 280px;
+    height: 180px;
+
+    right: 8%;
+    bottom: 12%;
+
+    border:
+        1px solid
+        rgba(255,255,255,.15);
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    opacity: 0;
+
+    transform:
+        translateY(20px)
+        scale(.95);
+
+    pointer-events: none;
+
+    transition:
+        .4s
+        cubic-bezier(.16,1,.3,1);
+
+    z-index: 10;
+
+    background: #111;
+}
+
+
+/* preview 내부 */
+
+.preview-content {
+
+    width: 100%;
+    height: 100%;
+
+    padding: 25px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: flex-end;
+}
+
+.preview-title {
+
+    font-size: 25px;
+
+    font-weight: bold;
+}
+
+.preview-text {
+
+    margin-top: 5px;
+
+    color: #777;
+
+    font-size: 11px;
+}
+
+
+/* =========================
+   REVEAL
+========================= */
+
+.item {
+
+    opacity: 0;
+
+    transform:
+        translateY(30px);
+
+    animation:
+        reveal .8s
+        forwards;
+}
+
+.item:nth-child(1) {
+    animation-delay: .1s;
+}
+
+.item:nth-child(2) {
+    animation-delay: .18s;
+}
+
+.item:nth-child(3) {
+    animation-delay: .26s;
+}
+
+.item:nth-child(4) {
+    animation-delay: .34s;
+}
+
+.item:nth-child(5) {
+    animation-delay: .42s;
+}
+
+.item:nth-child(6) {
+    animation-delay: .50s;
+}
+
+@keyframes reveal {
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width: 800px) {
+
+    header {
+
+        height: 80px;
+
+        padding: 0 6%;
+    }
+
+    .header-info {
+        display: none;
+    }
+
+    main {
+
+        width: 88%;
+
+        padding-top: 70px;
+    }
+
+    .title {
+
+        margin-bottom: 60px;
+    }
+
+    .title h1 {
+
+        letter-spacing: -5px;
+    }
+
+    .item {
+
+        min-height: 100px;
+
+        grid-template-columns:
+            45px
+            1fr
+            25px;
+
+        gap: 10px;
+
+        padding: 20px 5px;
+    }
+
+    .description {
+
+        display: none;
+    }
+
+    .name {
+
+        font-size: 30px;
+
+        letter-spacing: -2px;
+    }
+
+    .preview {
+        display: none;
+    }
+
+    footer {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 20px;
+    }
+}
+
+</style>
+
 </head>
 
 
 <body>
 
-    <div class="background"></div>
-    <div class="grid"></div>
 
-    <div class="progress"></div>
+<div class="background"></div>
+
+<div class="grid"></div>
 
 
-    <!-- NAVIGATION -->
+<!-- HEADER -->
 
-    <nav>
+<header>
 
-        <div class="logo">
-            ALEX<span>.</span>
+    <div class="logo">
+        ALEX<span>.</span>
+    </div>
+
+    <div class="header-info">
+        PORTFOLIO / 2026
+    </div>
+
+</header>
+
+
+<!-- MAIN -->
+
+<main>
+
+
+    <!-- TITLE -->
+
+    <div class="title">
+
+        <div class="title-small">
+            SELECTED WORKS
         </div>
 
-        <ul>
-            <li><a href="#about">ABOUT</a></li>
-            <li><a href="#skills">SKILLS</a></li>
-            <li><a href="#projects">PROJECTS</a></li>
-            <li><a href="#experience">EXPERIENCE</a></li>
-            <li><a href="#contact">CONTACT</a></li>
-        </ul>
+        <h1>
+            PORTFOLIO<br>
+            <span>ARCHIVE.</span>
+        </h1>
 
-    </nav>
+    </div>
 
 
-    <!-- HERO -->
+    <!-- LIST -->
 
-    <header class="hero">
+    <div class="list">
 
-        <div class="hero-content">
 
-            <div class="eyebrow">
-                CREATIVE DEVELOPER / AI ENGINEER
+        <!-- 01 -->
+
+        <a
+            class="item"
+            href="project.html"
+            data-title="PROJECT"
+            data-text="AI · WEB · IOT · QUANTUM"
+        >
+
+            <div class="number">
+                01
             </div>
 
-            <h1>
-                BUILD<br>
-                <span class="outline">WHAT'S</span><br>
-                NEXT.
-            </h1>
-
-            <p class="hero-description">
-                기술과 아이디어를 연결하여
-                새로운 디지털 경험을 만드는 개발자입니다.
-                AI, Web, Data를 중심으로 다양한 프로젝트를 진행합니다.
-            </p>
-
-            <div class="buttons">
-
-                <a href="#projects" class="btn primary">
-                    PROJECTS →
-                </a>
-
-                <a href="#contact" class="btn secondary">
-                    CONTACT
-                </a>
-
+            <div class="name">
+                Projects
             </div>
 
+            <div class="description">
+                AI / Web / IoT / Interactive
+            </div>
+
+            <div class="arrow">
+                ↗
+            </div>
+
+        </a>
+
+
+        <!-- 02 -->
+
+        <a
+            class="item"
+            href="education.html"
+            data-title="EDUCATION"
+            data-text="LECTURE · TRAINING · MENTORING"
+        >
+
+            <div class="number">
+                02
+            </div>
+
+            <div class="name">
+                Education
+            </div>
+
+            <div class="description">
+                Lecture / Training / Mentoring
+            </div>
+
+            <div class="arrow">
+                ↗
+            </div>
+
+        </a>
+
+
+        <!-- 03 -->
+
+        <a
+            class="item"
+            href="research.html"
+            data-title="RESEARCH"
+            data-text="AI · DATA · QUANTUM"
+        >
+
+            <div class="number">
+                03
+            </div>
+
+            <div class="name">
+                Research
+            </div>
+
+            <div class="description">
+                AI / Data / Quantum Computing
+            </div>
+
+            <div class="arrow">
+                ↗
+            </div>
+
+        </a>
+
+
+        <!-- 04 -->
+
+        <a
+            class="item"
+            href="hardware.html"
+            data-title="HARDWARE"
+            data-text="ARDUINO · ESP32 · SMART FARM"
+        >
+
+            <div class="number">
+                04
+            </div>
+
+            <div class="name">
+                Hardware
+            </div>
+
+            <div class="description">
+                Arduino / ESP32 / Smart Farm
+            </div>
+
+            <div class="arrow">
+                ↗
+            </div>
+
+        </a>
+
+
+        <!-- 05 -->
+
+        <a
+            class="item"
+            href="contents.html"
+            data-title="CONTENTS"
+            data-text="IMAGE · VIDEO · GENERATIVE AI"
+        >
+
+            <div class="number">
+                05
+            </div>
+
+            <div class="name">
+                Contents
+            </div>
+
+            <div class="description">
+                Image / Video / Generative AI
+            </div>
+
+            <div class="arrow">
+                ↗
+            </div>
+
+        </a>
+
+
+        <!-- 06 -->
+
+        <a
+            class="item"
+            href="about.html"
+            data-title="ABOUT"
+            data-text="PROFILE · CAREER · SKILLS"
+        >
+
+            <div class="number">
+                06
+            </div>
+
+            <div class="name">
+                About
+            </div>
+
+            <div class="description">
+                Profile / Career / Skills
+            </div>
+
+            <div class="arrow">
+                ↗
+            </div>
+
+        </a>
+
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div>
+            © 2026 ALEX KIM
         </div>
 
-        <div class="orb"></div>
+        <div class="footer-links">
 
-    </header>
+            <a href="#">
+                GITHUB
+            </a>
 
+            <a href="#">
+                EMAIL
+            </a>
 
-    <!-- ABOUT -->
-
-    <section id="about">
-
-        <h2 class="section-title reveal">
-            ABOUT <span>ME</span>
-        </h2>
-
-        <div class="about reveal">
-
-            <div class="about-text">
-
-                <p>
-                    안녕하세요.
-                    저는 새로운 기술을 실험하고
-                    그것을 실제 서비스와 경험으로 연결하는
-                    <strong>Creative Developer</strong>입니다.
-                </p>
-
-                <br>
-
-                <p>
-                    AI와 데이터 분석부터
-                    인터랙티브 웹, IoT까지
-                    서로 다른 기술을 결합하여
-                    새로운 가능성을 탐색합니다.
-                </p>
-
-                <br>
-
-                <p>
-                    복잡한 기술을 쉽고 재미있는 경험으로
-                    만드는 것을 가장 중요하게 생각합니다.
-                </p>
-
-            </div>
-
-
-            <div class="stats">
-
-                <div class="stat">
-                    <h3>42+</h3>
-                    <p>Projects</p>
-                </div>
-
-                <div class="stat">
-                    <h3>08</h3>
-                    <p>Years</p>
-                </div>
-
-                <div class="stat">
-                    <h3>18</h3>
-                    <p>Technologies</p>
-                </div>
-
-                <div class="stat">
-                    <h3>12K</h3>
-                    <p>Lines of Code</p>
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- SKILLS -->
-
-    <section id="skills">
-
-        <h2 class="section-title reveal">
-            MY <span>TOOLBOX</span>
-        </h2>
-
-        <div class="skills reveal">
-
-            <div class="skill">Python</div>
-            <div class="skill">JavaScript</div>
-            <div class="skill">React</div>
-            <div class="skill">Node.js</div>
-            <div class="skill">TensorFlow</div>
-            <div class="skill">PyTorch</div>
-            <div class="skill">OpenCV</div>
-            <div class="skill">Generative AI</div>
-            <div class="skill">Data Analysis</div>
-            <div class="skill">Arduino</div>
-            <div class="skill">ESP32</div>
-            <div class="skill">IoT</div>
-
-        </div>
-
-    </section>
-
-
-    <!-- PROJECTS -->
-
-    <section id="projects">
-
-        <h2 class="section-title reveal">
-            SELECTED <span>WORK</span>
-        </h2>
-
-
-        <div class="projects">
-
-            <article class="project reveal">
-
-                <div class="project-number">
-                    01 / AI
-                </div>
-
-                <h3>
-                    Vision<br>
-                    Assistant
-                </h3>
-
-                <p>
-                    카메라 영상을 실시간 분석하여
-                    주변 사물을 인식하고 사용자에게
-                    정보를 제공하는 AI 시스템.
-                </p>
-
-                <div class="tags">
-                    <span class="tag">Python</span>
-                    <span class="tag">YOLO</span>
-                    <span class="tag">AI</span>
-                </div>
-
-            </article>
-
-
-            <article class="project reveal">
-
-                <div class="project-number">
-                    02 / WEB
-                </div>
-
-                <h3>
-                    Urban<br>
-                    Flow
-                </h3>
-
-                <p>
-                    도시 데이터를 인터랙티브하게
-                    시각화하여 복잡한 정보를
-                    직관적으로 탐색할 수 있는 웹.
-                </p>
-
-                <div class="tags">
-                    <span class="tag">JavaScript</span>
-                    <span class="tag">WebGL</span>
-                    <span class="tag">Data</span>
-                </div>
-
-            </article>
-
-
-            <article class="project reveal">
-
-                <div class="project-number">
-                    03 / IoT
-                </div>
-
-                <h3>
-                    Smart<br>
-                    Garden
-                </h3>
-
-                <p>
-                    토양 습도와 온도를 측정하고
-                    조건에 따라 자동으로 물을 공급하는
-                    스마트 IoT 시스템.
-                </p>
-
-                <div class="tags">
-                    <span class="tag">ESP32</span>
-                    <span class="tag">IoT</span>
-                    <span class="tag">Sensor</span>
-                </div>
-
-            </article>
-
-
-            <article class="project reveal">
-
-                <div class="project-number">
-                    04 / QUANTUM
-                </div>
-
-                <h3>
-                    Quantum<br>
-                    Game
-                </h3>
-
-                <p>
-                    게임 이론과 양자 컴퓨팅을 결합하여
-                    전략에 따른 결과를 시각적으로
-                    실험할 수 있는 프로젝트.
-                </p>
-
-                <div class="tags">
-                    <span class="tag">Qiskit</span>
-                    <span class="tag">Quantum</span>
-                    <span class="tag">Game</span>
-                </div>
-
-            </article>
-
-        </div>
-
-    </section>
-
-
-    <!-- EXPERIENCE -->
-
-    <section id="experience">
-
-        <h2 class="section-title reveal">
-            EXPERIENCE <span>LOG</span>
-        </h2>
-
-
-        <div class="timeline">
-
-            <div class="timeline-item reveal">
-
-                <div class="year">
-                    2026
-                </div>
-
-                <h3>
-                    Independent AI Developer
-                </h3>
-
-                <p>
-                    생성형 AI와 인터랙티브 웹을 활용한
-                    다양한 실험 프로젝트 진행
-                </p>
-
-            </div>
-
-
-            <div class="timeline-item reveal">
-
-                <div class="year">
-                    2024 — 2025
-                </div>
-
-                <h3>
-                    Creative Technology Lab
-                </h3>
-
-                <p>
-                    AI, IoT, 데이터 시각화 프로젝트 개발
-                </p>
-
-            </div>
-
-
-            <div class="timeline-item reveal">
-
-                <div class="year">
-                    2021 — 2024
-                </div>
-
-                <h3>
-                    Web Developer
-                </h3>
-
-                <p>
-                    사용자 경험을 중심으로 한
-                    웹 서비스 및 인터랙티브 콘텐츠 개발
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- CONTACT -->
-
-    <section id="contact" class="contact">
-
-        <div class="reveal">
-
-            <div class="eyebrow">
-                HAVE AN IDEA?
-            </div>
-
-            <h2>
-                LET'S<br>
-                <span>CREATE.</span>
-            </h2>
-
-            <p>
-                새로운 프로젝트를 함께 만들어보세요.
-            </p>
-
-            <a
-                href="mailto:hello@example.com"
-                class="btn primary"
-            >
-                hello@example.com
+            <a href="#">
+                LINKEDIN
             </a>
 
         </div>
 
-    </section>
+    </footer>
+
+</main>
 
 
-    <script>
+<!-- PREVIEW -->
 
-        /* 마우스 위치 */
+<div class="preview">
 
-        document.addEventListener("mousemove", function(e) {
+    <div class="preview-content">
 
-            document.documentElement.style.setProperty(
-                "--x",
+        <div
+            class="preview-title"
+            id="previewTitle">
+            PROJECT
+        </div>
+
+        <div
+            class="preview-text"
+            id="previewText">
+            AI · WEB · IOT · QUANTUM
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   MOUSE BACKGROUND
+========================= */
+
+document.addEventListener(
+    "mousemove",
+    function(e) {
+
+        document.documentElement
+            .style
+            .setProperty(
+                "--mouse-x",
                 e.clientX + "px"
             );
 
-            document.documentElement.style.setProperty(
-                "--y",
+        document.documentElement
+            .style
+            .setProperty(
+                "--mouse-y",
                 e.clientY + "px"
             );
 
-        });
+    }
+);
 
 
-        /* 스크롤 진행률 */
+/* =========================
+   ITEM PREVIEW
+========================= */
 
-        window.addEventListener("scroll", function() {
+const items =
+    document.querySelectorAll(".item");
 
-            const scrollTop = window.scrollY;
+const preview =
+    document.querySelector(".preview");
 
-            const documentHeight =
-                document.documentElement.scrollHeight -
-                window.innerHeight;
+const previewTitle =
+    document.querySelector("#previewTitle");
 
-            const progress =
-                (scrollTop / documentHeight) * 100;
-
-            document.querySelector(".progress")
-                .style.width = progress + "%";
-
-        });
+const previewText =
+    document.querySelector("#previewText");
 
 
-        /* 등장 애니메이션 */
+items.forEach(function(item) {
 
-        const observer =
-            new IntersectionObserver(
-                function(entries) {
+    item.addEventListener(
+        "mouseenter",
+        function() {
 
-                    entries.forEach(function(entry) {
+            previewTitle.textContent =
+                item.dataset.title;
 
-                        if (entry.isIntersecting) {
+            previewText.textContent =
+                item.dataset.text;
 
-                            entry.target.classList.add("show");
+            preview.style.opacity = "1";
 
-                        }
+            preview.style.transform =
+                "translateY(0) scale(1)";
 
-                    });
-
-                },
-                {
-                    threshold: 0.15
-                }
-            );
+        }
+    );
 
 
-        document
-            .querySelectorAll(".reveal")
-            .forEach(function(element) {
+    item.addEventListener(
+        "mouseleave",
+        function() {
 
-                observer.observe(element);
+            preview.style.opacity = "0";
 
-            });
+            preview.style.transform =
+                "translateY(20px) scale(.95)";
 
+        }
+    );
 
-        /* 프로젝트 3D Tilt */
-
-        document
-            .querySelectorAll(".project")
-            .forEach(function(card) {
-
-                card.addEventListener(
-                    "mousemove",
-                    function(e) {
-
-                        const rect =
-                            card.getBoundingClientRect();
-
-                        const x =
-                            e.clientX - rect.left;
-
-                        const y =
-                            e.clientY - rect.top;
-
-                        const centerX =
-                            rect.width / 2;
-
-                        const centerY =
-                            rect.height / 2;
-
-                        const rotateX =
-                            (y - centerY) / 20;
-
-                        const rotateY =
-                            (centerX - x) / 20;
-
-                        card.style.transform =
-                            `
-                            perspective(800px)
-                            rotateX(${rotateX}deg)
-                            rotateY(${rotateY}deg)
-                            translateY(-8px)
-                            `;
-
-                    }
-                );
+});
 
 
-                card.addEventListener(
-                    "mouseleave",
-                    function() {
+/* =========================
+   PREVIEW MOUSE FOLLOW
+========================= */
 
-                        card.style.transform =
-                            "perspective(800px) rotateX(0deg) rotateY(0deg)";
+document.addEventListener(
+    "mousemove",
+    function(e) {
 
-                    }
-                );
+        if (window.innerWidth <= 800)
+            return;
 
-            });
+        const x =
+            e.clientX * 0.03;
 
-    </script>
+        const y =
+            e.clientY * 0.03;
+
+        preview.style.marginRight =
+            x + "px";
+
+        preview.style.marginBottom =
+            y + "px";
+
+    }
+);
+
+</script>
+
 
 </body>
+
 </html>
