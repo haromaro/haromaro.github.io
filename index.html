@@ -2,113 +2,240 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Firebase 테스트</title>
 </head>
 
 <body>
 
-<h1>Firebase 연결 테스트</h1>
+    <h1>Firebase 연결 테스트</h1>
 
-<button id="saveBtn">데이터 저장</button>
-<button id="loadBtn">데이터 불러오기</button>
+    <button id="saveBtn">데이터 저장</button>
+    <button id="loadBtn">데이터 불러오기</button>
 
-<script type="module">
+    <hr>
 
-    // Firebase
-    import { initializeApp }
-        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    <h2>데이터 입력</h2>
 
-    // Firestore
-    import {
-        getFirestore,
-        collection,
-        addDoc,
-        getDocs
-    } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    <input
+        type="text"
+        id="idInput"
+        placeholder="아이디"
+    >
+
+    <input
+        type="text"
+        id="nameInput"
+        placeholder="이름"
+    >
+
+    <input
+        type="password"
+        id="pwInput"
+        placeholder="비밀번호"
+    >
+
+    <script type="module">
+
+        // ==================================================
+        // Firebase SDK
+        // ==================================================
+
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            getDocs
+        }
+        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
-    // =========================
-    // Firebase 설정
-    // =========================
+        // ==================================================
+        // Firebase 설정
+        // ==================================================
 
-    const firebaseConfig = {
+        const firebaseConfig = {
+
+            // Firebase 콘솔에서 확인한 값
+  apiKey: "AIzaSyDGZzb7updIhXys_5M1WUbSdTCTt5hUps8",
   authDomain: "studio-4659441404-b129a.firebaseapp.com",
   projectId: "studio-4659441404-b129a",
   storageBucket: "studio-4659441404-b129a.firebasestorage.app",
   messagingSenderId: "126559177104",
   appId: "1:126559177104:web:907db9ca93560988468b15"
-    };
+        };
 
 
-    // Firebase 초기화
-    const app = initializeApp(firebaseConfig);
+        // ==================================================
+        // Firebase 초기화
+        // ==================================================
 
-    // Firestore 연결
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
 
 
-    // =========================
-    // 데이터 저장
-    // =========================
+        // ==================================================
+        // Firestore 연결
+        // ==================================================
 
-    document.getElementById("saveBtn").addEventListener("click", async () => {
+        const db = getFirestore(app);
 
-        try {
 
-            const docRef = await addDoc(
-                collection(db, "test_userlist"),
-                {
-                    user: "hong123",
-                    name: "홍길동",
-                    pw: "1234"
+        // ==================================================
+        // 컬렉션 이름
+        // ==================================================
+
+        const userCollection =
+            collection(db, "test_userlist");
+
+
+        // ==================================================
+        // 데이터 저장
+        // ==================================================
+
+        document
+            .getElementById("saveBtn")
+            .addEventListener("click", async () => {
+
+                try {
+
+                    // 입력값 가져오기
+                    const id =
+                        document.getElementById("idInput").value;
+
+                    const name =
+                        document.getElementById("nameInput").value;
+
+                    const pw =
+                        document.getElementById("pwInput").value;
+
+
+                    // 빈 값 확인
+                    if (!id || !name || !pw) {
+
+                        alert("모든 항목을 입력하세요.");
+
+                        return;
+                    }
+
+
+                    // Firestore 저장
+                    const docRef = await addDoc(
+                        userCollection,
+                        {
+                            id: id,
+                            name: name,
+                            pw: pw
+                        }
+                    );
+
+
+                    console.log(
+                        "저장 성공:",
+                        docRef.id
+                    );
+
+
+                    alert(
+                        "저장 성공!\n문서 ID: " +
+                        docRef.id
+                    );
+
+
+                    // 입력창 초기화
+                    document.getElementById("idInput").value = "";
+                    document.getElementById("nameInput").value = "";
+                    document.getElementById("pwInput").value = "";
+
                 }
-            );
 
-            console.log("저장 성공:", docRef.id);
+                catch (error) {
 
-            alert("저장 성공!");
+                    console.error(
+                        "저장 실패:",
+                        error
+                    );
 
-        } catch (error) {
-
-            console.error("저장 실패:", error);
-
-            alert("저장 실패\n" + error.message);
-        }
-
-    });
-
-
-    // =========================
-    // 데이터 불러오기
-    // =========================
-
-    document.getElementById("loadBtn").addEventListener("click", async () => {
-
-        try {
-
-            const querySnapshot =
-                await getDocs(collection(db, "test_userlist"));
-
-            querySnapshot.forEach((doc) => {
-
-                console.log(
-                    doc.id,
-                    doc.data()
-                );
+                    alert(
+                        "저장 실패\n" +
+                        error.message
+                    );
+                }
 
             });
 
-            alert("콘솔을 확인하세요.");
 
-        } catch (error) {
+        // ==================================================
+        // 데이터 불러오기
+        // ==================================================
 
-            console.error("불러오기 실패:", error);
+        document
+            .getElementById("loadBtn")
+            .addEventListener("click", async () => {
 
-        }
+                try {
 
-    });
+                    // test_userlist 전체 가져오기
+                    const querySnapshot =
+                        await getDocs(userCollection);
 
-</script>
+
+                    console.clear();
+
+                    console.log(
+                        "===== 사용자 목록 ====="
+                    );
+
+
+                    // 문서 하나씩 확인
+                    querySnapshot.forEach((doc) => {
+
+                        console.log(
+                            "문서 ID:",
+                            doc.id
+                        );
+
+                        console.log(
+                            "데이터:",
+                            doc.data()
+                        );
+
+                    });
+
+
+                    console.log(
+                        "======================"
+                    );
+
+
+                    alert(
+                        "데이터 불러오기 성공!\n" +
+                        "총 " +
+                        querySnapshot.size +
+                        "개"
+                    );
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        "불러오기 실패:",
+                        error
+                    );
+
+                    alert(
+                        "불러오기 실패\n" +
+                        error.message
+                    );
+                }
+
+            });
+
+    </script>
 
 </body>
 </html>
