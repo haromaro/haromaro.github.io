@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,12 +12,9 @@
 
     <h1>Firebase 연결 테스트</h1>
 
-    <button id="saveBtn">데이터 저장</button>
-    <button id="loadBtn">데이터 불러오기</button>
-
     <hr>
 
-    <h2>데이터 입력</h2>
+    <h2>사용자 등록</h2>
 
     <input
         type="text"
@@ -24,17 +22,38 @@
         placeholder="아이디"
     >
 
+    <br><br>
+
     <input
         type="text"
-        id="nameInput"
+        id="userInput"
         placeholder="이름"
     >
+
+    <br><br>
 
     <input
         type="password"
         id="pwInput"
         placeholder="비밀번호"
     >
+
+    <br><br>
+
+    <button id="saveBtn">
+        데이터 저장
+    </button>
+
+    <hr>
+
+    <h2>사용자 목록</h2>
+
+    <button id="loadBtn">
+        데이터 불러오기
+    </button>
+
+    <div id="result"></div>
+
 
     <script type="module">
 
@@ -58,16 +77,14 @@
         // Firebase 설정
         // ==================================================
 
-        const firebaseConfig = {
-
-            // Firebase 콘솔에서 확인한 값
-  apiKey: "AIzaSyDGZzb7updIhXys_5M1WUbSdTCTt5hUps8",
-  authDomain: "studio-4659441404-b129a.firebaseapp.com",
-  projectId: "studio-4659441404-b129a",
-  storageBucket: "studio-4659441404-b129a.firebasestorage.app",
-  messagingSenderId: "126559177104",
-  appId: "1:126559177104:web:907db9ca93560988468b15"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyBu1f_9ZH20urzVju4lh_9DGP_4qwUY9nU",
+  authDomain: "fir-test2-72692.firebaseapp.com",
+  projectId: "fir-test2-72692",
+  storageBucket: "fir-test2-72692.firebasestorage.app",
+  messagingSenderId: "606077351717",
+  appId: "1:606077351717:web:dc82bd34ebc78883570ccc"
+};
 
 
         // ==================================================
@@ -85,11 +102,11 @@
 
 
         // ==================================================
-        // 컬렉션 이름
+        // 사용할 컬렉션
         // ==================================================
 
         const userCollection =
-            collection(db, "test_userlist");
+            collection(db, "test_num1");
 
 
         // ==================================================
@@ -104,17 +121,23 @@
 
                     // 입력값 가져오기
                     const id =
-                        document.getElementById("idInput").value;
+                        document
+                            .getElementById("idInput")
+                            .value;
 
-                    const name =
-                        document.getElementById("nameInput").value;
+                    const user =
+                        document
+                            .getElementById("userInput")
+                            .value;
 
                     const pw =
-                        document.getElementById("pwInput").value;
+                        document
+                            .getElementById("pwInput")
+                            .value;
 
 
                     // 빈 값 확인
-                    if (!id || !name || !pw) {
+                    if (!id || !user || !pw) {
 
                         alert("모든 항목을 입력하세요.");
 
@@ -122,33 +145,42 @@
                     }
 
 
-                    // Firestore 저장
+                    // Firestore에 저장
                     const docRef = await addDoc(
                         userCollection,
                         {
                             id: id,
-                            name: name,
-                            pw: pw
+                            pw: pw,
+                            user: user
                         }
                     );
 
 
                     console.log(
-                        "저장 성공:",
+                        "저장 성공",
                         docRef.id
                     );
 
 
                     alert(
-                        "저장 성공!\n문서 ID: " +
+                        "저장되었습니다.\n\n" +
+                        "문서 ID: " +
                         docRef.id
                     );
 
 
                     // 입력창 초기화
-                    document.getElementById("idInput").value = "";
-                    document.getElementById("nameInput").value = "";
-                    document.getElementById("pwInput").value = "";
+                    document
+                        .getElementById("idInput")
+                        .value = "";
+
+                    document
+                        .getElementById("userInput")
+                        .value = "";
+
+                    document
+                        .getElementById("pwInput")
+                        .value = "";
 
                 }
 
@@ -160,7 +192,7 @@
                     );
 
                     alert(
-                        "저장 실패\n" +
+                        "저장 실패\n\n" +
                         error.message
                     );
                 }
@@ -178,45 +210,81 @@
 
                 try {
 
-                    // test_userlist 전체 가져오기
-                    const querySnapshot =
+                    // test_num1 컬렉션의 모든 문서 가져오기
+                    const snapshot =
                         await getDocs(userCollection);
 
-
-                    console.clear();
 
                     console.log(
                         "===== 사용자 목록 ====="
                     );
 
 
-                    // 문서 하나씩 확인
-                    querySnapshot.forEach((doc) => {
+                    // 화면 초기화
+                    const result =
+                        document.getElementById("result");
 
+                    result.innerHTML = "";
+
+
+                    // 문서 반복
+                    snapshot.forEach((doc) => {
+
+                        const data =
+                            doc.data();
+
+
+                        // 콘솔 출력
                         console.log(
                             "문서 ID:",
                             doc.id
                         );
 
                         console.log(
-                            "데이터:",
-                            doc.data()
+                            "id:",
+                            data.id
                         );
+
+                        console.log(
+                            "user:",
+                            data.user
+                        );
+
+                        console.log(
+                            "pw:",
+                            data.pw
+                        );
+
+
+                        // 화면 출력
+                        const div =
+                            document.createElement("div");
+
+                        div.innerHTML = `
+                            <hr>
+                            <p>문서 ID: ${doc.id}</p>
+                            <p>아이디: ${data.id}</p>
+                            <p>이름: ${data.user}</p>
+                            <p>비밀번호: ${data.pw}</p>
+                        `;
+
+                        result.appendChild(div);
 
                     });
 
 
                     console.log(
-                        "======================"
+                        "총 문서 수:",
+                        snapshot.size
                     );
 
 
-                    alert(
-                        "데이터 불러오기 성공!\n" +
-                        "총 " +
-                        querySnapshot.size +
-                        "개"
-                    );
+                    if (snapshot.empty) {
+
+                        result.innerHTML =
+                            "<p>등록된 사용자가 없습니다.</p>";
+
+                    }
 
                 }
 
@@ -228,7 +296,7 @@
                     );
 
                     alert(
-                        "불러오기 실패\n" +
+                        "불러오기 실패\n\n" +
                         error.message
                     );
                 }
@@ -238,4 +306,5 @@
     </script>
 
 </body>
+
 </html>
