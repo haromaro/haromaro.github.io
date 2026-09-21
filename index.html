@@ -56,7 +56,7 @@
         try {
 
             const docRef = await addDoc(
-                collection(db, "userList"),
+                collection(db, "test_userlist"),
                 {
                     user: "hong123",
                     name: "홍길동",
@@ -87,7 +87,7 @@
         try {
 
             const querySnapshot =
-                await getDocs(collection(db, "userList"));
+                await getDocs(collection(db, "test_userlist"));
 
             querySnapshot.forEach((doc) => {
 
