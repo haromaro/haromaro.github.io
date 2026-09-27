@@ -1,310 +1,246 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>Firebase 테스트</title>
+    <title>태블릿 메뉴판</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Noto Sans KR",
+                "Malgun Gothic",
+                sans-serif;
+
+            background: #f5f6f8;
+            color: #222;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            overflow: hidden;
+        }
+
+        /* 전체 화면 */
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            padding: 50px;
+        }
+
+        /* 상단 제목 */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            font-size: clamp(16px, 2.5vw, 24px);
+            color: #777;
+        }
+
+        /* 버튼 영역 */
+        .menu {
+            width: 100%;
+
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            gap: 30px;
+        }
+
+        /* 버튼 */
+        .menu-button {
+            min-height: 300px;
+
+            border: none;
+            border-radius: 30px;
+
+            cursor: pointer;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+        }
+
+        .menu-button:hover {
+            transform: translateY(-5px);
+        }
+
+        .menu-button:active {
+            transform: scale(0.97);
+        }
+
+        /* 아이콘 */
+        .icon {
+            font-size: 80px;
+            margin-bottom: 25px;
+        }
+
+        /* 버튼 제목 */
+        .button-title {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* 버튼 설명 */
+        .button-description {
+            font-size: clamp(15px, 2vw, 20px);
+            opacity: 0.7;
+        }
+
+        /* 주문하기 */
+        .order {
+            background: #222;
+            color: white;
+
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 관리하기 */
+        .admin {
+            background: white;
+            color: #222;
+
+            border: 2px solid #e5e5e5;
+
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 태블릿 세로 화면 */
+        @media (max-width: 700px) {
+
+            .container {
+                padding: 30px;
+            }
+
+            .header {
+                margin-bottom: 40px;
+            }
+
+            .menu {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .menu-button {
+                min-height: 220px;
+            }
+
+            .icon {
+                font-size: 60px;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* 작은 화면 */
+        @media (max-height: 700px) {
+
+            .header {
+                margin-bottom: 30px;
+            }
+
+            .menu-button {
+                min-height: 200px;
+            }
+
+            .icon {
+                font-size: 50px;
+                margin-bottom: 10px;
+            }
+        }
+
+    </style>
 </head>
 
 <body>
 
-    <h1>Firebase 연결 테스트</h1>
+    <main class="container">
 
-    <hr>
+        <!-- 제목 -->
+        <header class="header">
+            <h1>메뉴판</h1>
+            <p>원하시는 서비스를 선택해주세요.</p>
+        </header>
 
-    <h2>사용자 등록</h2>
 
-    <input
-        type="text"
-        id="idInput"
-        placeholder="아이디"
-    >
+        <!-- 메뉴 -->
+        <section class="menu">
 
-    <br><br>
+            <!-- 주문하기 -->
+            <button
+                class="menu-button order"
+                onclick="location.href='kiosk.html'">
 
-    <input
-        type="text"
-        id="userInput"
-        placeholder="이름"
-    >
+                <div class="icon">🛒</div>
 
-    <br><br>
+                <div class="button-title">
+                    주문하기
+                </div>
 
-    <input
-        type="password"
-        id="pwInput"
-        placeholder="비밀번호"
-    >
+                <div class="button-description">
+                    메뉴를 선택하고 주문합니다.
+                </div>
 
-    <br><br>
+            </button>
 
-    <button id="saveBtn">
-        데이터 저장
-    </button>
 
-    <hr>
+            <!-- 관리하기 -->
+            <button
+                class="menu-button admin"
+                onclick="location.href='admin-login.html'">
 
-    <h2>사용자 목록</h2>
+                <div class="icon">⚙️</div>
 
-    <button id="loadBtn">
-        데이터 불러오기
-    </button>
+                <div class="button-title">
+                    관리하기
+                </div>
 
-    <div id="result"></div>
+                <div class="button-description">
+                    관리자 페이지로 이동합니다.
+                </div>
 
+            </button>
 
-    <script type="module">
+        </section>
 
-        // ==================================================
-        // Firebase SDK
-        // ==================================================
-
-        import { initializeApp }
-            from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-
-        import {
-            getFirestore,
-            collection,
-            addDoc,
-            getDocs
-        }
-        from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
-
-        // ==================================================
-        // Firebase 설정
-        // ==================================================
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBu1f_9ZH20urzVju4lh_9DGP_4qwUY9nU",
-  authDomain: "fir-test2-72692.firebaseapp.com",
-  projectId: "fir-test2-72692",
-  storageBucket: "fir-test2-72692.firebasestorage.app",
-  messagingSenderId: "606077351717",
-  appId: "1:606077351717:web:dc82bd34ebc78883570ccc"
-};
-
-
-        // ==================================================
-        // Firebase 초기화
-        // ==================================================
-
-        const app = initializeApp(firebaseConfig);
-
-
-        // ==================================================
-        // Firestore 연결
-        // ==================================================
-
-        const db = getFirestore(app);
-
-
-        // ==================================================
-        // 사용할 컬렉션
-        // ==================================================
-
-        const userCollection =
-            collection(db, "test_num1");
-
-
-        // ==================================================
-        // 데이터 저장
-        // ==================================================
-
-        document
-            .getElementById("saveBtn")
-            .addEventListener("click", async () => {
-
-                try {
-
-                    // 입력값 가져오기
-                    const id =
-                        document
-                            .getElementById("idInput")
-                            .value;
-
-                    const user =
-                        document
-                            .getElementById("userInput")
-                            .value;
-
-                    const pw =
-                        document
-                            .getElementById("pwInput")
-                            .value;
-
-
-                    // 빈 값 확인
-                    if (!id || !user || !pw) {
-
-                        alert("모든 항목을 입력하세요.");
-
-                        return;
-                    }
-
-
-                    // Firestore에 저장
-                    const docRef = await addDoc(
-                        userCollection,
-                        {
-                            id: id,
-                            pw: pw,
-                            user: user
-                        }
-                    );
-
-
-                    console.log(
-                        "저장 성공",
-                        docRef.id
-                    );
-
-
-                    alert(
-                        "저장되었습니다.\n\n" +
-                        "문서 ID: " +
-                        docRef.id
-                    );
-
-
-                    // 입력창 초기화
-                    document
-                        .getElementById("idInput")
-                        .value = "";
-
-                    document
-                        .getElementById("userInput")
-                        .value = "";
-
-                    document
-                        .getElementById("pwInput")
-                        .value = "";
-
-                }
-
-                catch (error) {
-
-                    console.error(
-                        "저장 실패:",
-                        error
-                    );
-
-                    alert(
-                        "저장 실패\n\n" +
-                        error.message
-                    );
-                }
-
-            });
-
-
-        // ==================================================
-        // 데이터 불러오기
-        // ==================================================
-
-        document
-            .getElementById("loadBtn")
-            .addEventListener("click", async () => {
-
-                try {
-
-                    // test_num1 컬렉션의 모든 문서 가져오기
-                    const snapshot =
-                        await getDocs(userCollection);
-
-
-                    console.log(
-                        "===== 사용자 목록 ====="
-                    );
-
-
-                    // 화면 초기화
-                    const result =
-                        document.getElementById("result");
-
-                    result.innerHTML = "";
-
-
-                    // 문서 반복
-                    snapshot.forEach((doc) => {
-
-                        const data =
-                            doc.data();
-
-
-                        // 콘솔 출력
-                        console.log(
-                            "문서 ID:",
-                            doc.id
-                        );
-
-                        console.log(
-                            "id:",
-                            data.id
-                        );
-
-                        console.log(
-                            "user:",
-                            data.user
-                        );
-
-                        console.log(
-                            "pw:",
-                            data.pw
-                        );
-
-
-                        // 화면 출력
-                        const div =
-                            document.createElement("div");
-
-                        div.innerHTML = `
-                            <hr>
-                            <p>문서 ID: ${doc.id}</p>
-                            <p>아이디: ${data.id}</p>
-                            <p>이름: ${data.user}</p>
-                            <p>비밀번호: ${data.pw}</p>
-                        `;
-
-                        result.appendChild(div);
-
-                    });
-
-
-                    console.log(
-                        "총 문서 수:",
-                        snapshot.size
-                    );
-
-
-                    if (snapshot.empty) {
-
-                        result.innerHTML =
-                            "<p>등록된 사용자가 없습니다.</p>";
-
-                    }
-
-                }
-
-                catch (error) {
-
-                    console.error(
-                        "불러오기 실패:",
-                        error
-                    );
-
-                    alert(
-                        "불러오기 실패\n\n" +
-                        error.message
-                    );
-                }
-
-            });
-
-    </script>
+    </main>
 
 </body>
-
 </html>
