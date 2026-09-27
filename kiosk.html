@@ -828,8 +828,7 @@
 
         <button
             class="complete-button"
-            onclick="location.href='index.html'">
-
+    onclick="closeOrderComplete()">
             처음으로
 
         </button>
@@ -1651,7 +1650,18 @@
 
     renderCart();
 
+/* ========================================
+   주문 완료 팝업 닫기
+======================================== */
 
+window.closeOrderComplete =
+    function() {
+
+        document
+            .getElementById("orderComplete")
+            .style.display = "none";
+
+    };
 </script>
 
 
